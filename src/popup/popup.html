@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Worko Job Matcher</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div id="app" class="worko-extension">
+    <!-- Login State -->
+    <div id="login-state" class="login-container">
+      <div class="header">
+        <div class="logo">
+          <img src="icons/worko-logo.webp" alt="Worko" class="logo-icon">
+        </div>
+        <div id="header-loader" class="header-loader" style="display: none;">
+          <div class="loading-spinner-small"></div>
+        </div>
+      </div>
+      
+      <div class="content">
+        <div class="welcome-message">
+          <h2>Welcome to Worko!</h2>
+          <p>Connect your account to start scoring jobs</p>
+        </div>
+        
+        <button id="login-btn" class="btn-primary">
+          🔐 Login with Worko
+        </button>
+        
+        <p class="auth-note">Secure OIDC Authentication</p>
+      </div>
+    </div>
+
+    <!-- Main Dashboard State -->
+    <div id="dashboard-state" class="dashboard-container" style="display: none;">
+      <div class="header">
+        <div class="logo">
+          <img src="icons/worko-logo.webp" alt="Worko" class="logo-icon">
+        </div>
+        <div class="user-info">
+          <div class="user-details">
+            <span id="user-name">Loading...</span>
+            <a id="resume-link" href="#" target="_blank" class="resume-link" style="display: none;">📄 Resume</a>
+          </div>
+          <div class="user-menu-container">
+            <img id="user-avatar" src="" alt="Profile" class="user-avatar clickable" style="display: none;">
+            <div id="user-menu" class="user-menu" style="display: none;">
+              <button id="logout-btn" class="menu-item">
+                <span class="menu-icon">🚪</span>
+                <span class="menu-text">Logout</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <!-- Job Applications Section -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title-group">
+              <h3>📋 My Job Applications</h3>
+              <small id="data-cache-info" class="cache-info" style="display: none;">
+                Loaded just now
+              </small>
+            </div>
+            <button id="refresh-applications-btn" class="btn-refresh" title="Refresh applications">
+              🔄
+            </button>
+          </div>
+          <div id="job-applications" class="job-applications">
+            <!-- Job applications will be populated here -->
+            <div class="empty-state">
+              <p>No job applications yet</p>
+              <small>Apply to jobs to see them here!</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Job Detection Section -->
+        <div class="section job-detection-section">
+          <div class="job-detection-header">
+            <div class="job-detection-info">
+              <div class="job-detection-icon" id="job-detection-icon">🔍</div>
+              <div class="job-detection-content">
+                <h4 id="job-detection-title">Looking for job pages...</h4>
+                <p id="job-detection-subtitle">Navigate to a job posting to get started</p>
+              </div>
+            </div>
+            <div class="job-detection-status" id="job-detection-status">
+              <span class="status-indicator" id="status-indicator">⏳</span>
+            </div>
+          </div>
+          
+          <div class="job-detection-action">
+            <button id="score-job-btn" class="btn-primary full-width" disabled>
+              📈 Score Current Job
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Job Scoring State -->
+    <div id="scoring-state" class="scoring-container" style="display: none;">
+      <div class="header">
+        <div class="logo">
+          <img src="icons/worko-logo.webp" alt="Worko" class="logo-icon">
+          <button id="back-btn" class="btn-back">← Back</button>
+        </div>
+        <div class="header-loader">
+          <div class="loading-spinner-small"></div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="progress-container">
+          <div class="progress-steps">
+            <div class="step active">🔄 Extracting job details</div>
+            <div class="step">📊 Calculating match score</div>
+            <div class="step">✅ Generating results</div>
+          </div>
+          
+          <div class="progress-bar">
+            <div id="progress-fill" class="progress-fill"></div>
+          </div>
+          
+          <p class="progress-text">Please wait while we analyze this opportunity...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Score Results State -->
+    <div id="results-state" class="results-container" style="display: none;">
+      <div class="header">
+        <div class="logo">
+          <img src="icons/worko-logo.webp" alt="Worko" class="logo-icon">
+          <button id="results-back-btn" class="btn-back">← Back</button>
+        </div>
+        <div id="score-badge" class="score-badge">85%</div>
+      </div>
+
+      <div class="content">
+        <div class="job-info">
+          <h3 id="job-title">Software Engineer</h3>
+          <p id="job-company">TechCorp</p>
+          <p id="job-location">📍 Bangalore, India</p>
+        </div>
+
+        <!-- Overall Assessment -->
+        <div class="overall-explanation">
+          <div class="explanation-card">
+            <div class="explanation-icon">💡</div>
+            <div class="explanation-content">
+              <h4>Overall Assessment</h4>
+              <p id="overall-explanation-text">This role aligns well with your profile and experience.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detailed Score Breakdown -->
+        <div class="score-breakdown">
+          <h4>📊 Detailed Score Breakdown</h4>
+          <div id="breakdown-items" class="breakdown-items">
+            <!-- Breakdown items will be populated here -->
+          </div>
+        </div>
+
+        <!-- Skills Analysis -->
+        <div class="skills-analysis">
+          <div class="matching-skills">
+            <h4>✅ Your Matching Skills</h4>
+            <div id="matching-skills-list" class="skills-list">
+              <!-- Matching skills will be populated here -->
+            </div>
+          </div>
+
+          <div class="missing-skills">
+            <h4>📚 Skills to Develop</h4>
+            <div id="missing-skills-list" class="skills-list">
+              <!-- Missing skills will be populated here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="actions">
+          <button id="apply-job-btn" class="btn-primary">
+            🚀 Apply Now
+          </button>
+          <button id="save-job-btn" class="btn-secondary">
+            💾 Save Job
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="error-state" class="error-container" style="display: none;">
+      <div class="error-content">
+        <div class="error-icon">⚠️</div>
+        <h3>Something went wrong</h3>
+        <p id="error-message">An unexpected error occurred</p>
+        <button id="retry-btn" class="btn-secondary">Try Again</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

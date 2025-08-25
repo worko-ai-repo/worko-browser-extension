@@ -43,6 +43,144 @@ graph TB
 4. **Storage Manager**: Secure data persistence and retrieval
 5. **Authentication Manager**: OIDC flow handling and token management
 
+## API Integration
+
+### Worko API Endpoints
+
+Based on the existing Worko API structure, the browser extension will integrate with the following endpoints:
+
+#### Authentication APIs
+- **Base URL**: `https://api.worko.ai` (production) / `https://dev-api.worko.ai` (development)
+- **Authentication**: Cognito OIDC with JWT tokens
+- **Authorization**: Custom Lambda authorizer (`worko-auth`)
+
+#### User Profile APIs
+```typescript
+// Get user basic details
+GET /user/basic-details
+Authorization: Bearer {accessToken}
+
+// Get user profile details
+GET /user/{userId}/profile
+Authorization: Bearer {accessToken}
+
+// Get user skills
+GET /user/{userId}/skills
+Authorization: Bearer {accessToken}
+
+// Get user experience
+GET /user/{userId}/experience
+Authorization: Bearer {accessToken}
+```
+
+#### Local Job Matching Logic
+The extension will implement local job matching calculation similar to the worko-ui-react application, eliminating the need for API calls for scoring:
+
+```typescript
+// Local job matching service
+class LocalJobMatchingService {
+  calculateJobScore(jobData: JobData, userProfile: UserProfile): ScoreResponse {
+    const breakdown = {
+      experienceScore: this.calculateExperienceMatch(jobData, userProfile),
+      skillsScore: this.calculateSkillsMatch(jobData, userProfile),
+      educationScore: this.calculateEducationMatch(jobData, userProfile),
+      locationScore: this.calculateLocationMatch(jobData, userProfile),
+      industryScore: this.calculateIndustryMatch(jobData, userProfile),
+      roleScore: this.calculateRoleMatch(jobData, userProfile),
+      responsibilitiesScore: this.calculateResponsibilitiesMatch(jobData, userProfile)
+    };
+
+    const overallScore = this.calculateOverallScore(breakdown);
+    
+    return {
+      matchingScore: overallScore,
+      breakdown,
+      explanation: this.generateExplanations(breakdown, jobData, userProfile),
+      overallExplanation: this.generateOverallExplanation(overallScore, breakdown)
+    };
+  }
+
+  private calculateExperienceMatch(jobData: JobData, userProfile: UserProfile): number {
+    // Logic to match required experience vs user experience
+    const requiredExp = this.extractRequiredExperience(jobData.description);
+    const userExp = userProfile.experience;
+    
+    if (userExp >= requiredExp) return 100;
+    if (userExp >= requiredExp * 0.8) return 85;
+    if (userExp >= requiredExp * 0.6) return 70;
+    return Math.max(0, (userExp / requiredExp) * 100);
+  }
+
+  private calculateSkillsMatch(jobData: JobData, userProfile: UserProfile): number {
+    const requiredSkills = this.extractSkillsFromJobDescription(jobData.description);
+    const userSkills = userProfile.skills.map(s => s.toLowerCase());
+    
+    const matchedSkills = requiredSkills.filter(skill => 
+      userSkills.some(userSkill => 
+        userSkill.includes(skill.toLowerCase()) || 
+        skill.toLowerCase().includes(userSkill)
+      )
+    );
+    
+    return Math.min(100, (matchedSkills.length / requiredSkills.length) * 100);
+  }
+
+  // Additional matching methods for education, location, industry, etc.
+}
+```
+
+#### Job History Storage
+Job scoring history will be stored locally in the browser extension storage for privacy and performance:
+
+```typescript
+// Local storage schema for job history
+interface JobHistoryStorage {
+  jobScores: JobScore[];
+  maxHistorySize: 50; // Keep last 50 scored jobs
+}
+
+interface JobScore {
+  id: string;
+  jobData: JobData;
+  score: number;
+  breakdown: ScoreBreakdown;
+  timestamp: number;
+  applied: boolean;
+  platform: 'naukri' | 'linkedin';
+}
+
+// Storage service for job history
+class JobHistoryService {
+  async saveJobScore(jobScore: JobScore): Promise<void> {
+    const history = await this.getJobHistory();
+    history.unshift(jobScore); // Add to beginning
+    
+    // Keep only last 50 entries
+    if (history.length > 50) {
+      history.splice(50);
+    }
+    
+    await chrome.storage.local.set({ jobScores: history });
+  }
+
+  async getJobHistory(limit: number = 5): Promise<JobScore[]> {
+    const result = await chrome.storage.local.get(['jobScores']);
+    const history = result.jobScores || [];
+    return history.slice(0, limit);
+  }
+}
+```
+
+### Local Processing Benefits
+
+The extension uses local processing instead of API calls for job scoring:
+
+1. **Privacy**: Job descriptions and user data stay local
+2. **Performance**: Instant scoring without network latency
+3. **Offline Capability**: Works without internet connection
+4. **Cost Efficiency**: No API usage costs
+5. **Reliability**: No dependency on external services
+
 ## Components and Interfaces
 
 ### 1. Popup Interface (`popup.html`, `popup.js`, `popup.css`)
@@ -177,11 +315,80 @@ graph TB
 - Handle data persistence and retrieval
 - Manage extension lifecycle events
 
-**API Interface**:
+**API Client Implementation**:
+```javascript
+class WorkoAPIClient {
+  constructor() {
+    this.baseURL = process.env.NODE_ENV === 'production' 
+      ? 'https://api.worko.ai' 
+      : 'https://dev-api.worko.ai';
+    this.tokenManager = new TokenManager();
+  }
+
+  async makeAuthenticatedRequest(endpoint, options = {}) {
+    try {
+      const token = await this.tokenManager.getValidToken();
+      
+      const defaultOptions = {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          ...options.headers
+        }
+      };
+
+      const response = await fetch(`${this.baseURL}${endpoint}`, {
+        ...defaultOptions,
+        ...options
+      });
+
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('API request error:', error);
+      throw error;
+    }
+  }
+
+  async getUserBasicDetails() {
+    return await this.makeAuthenticatedRequest('/user/basic-details');
+  }
+
+  async getUserProfile(userId) {
+    return await this.makeAuthenticatedRequest(`/user/${userId}/profile`);
+  }
+
+  async getUserSkills(userId) {
+    return await this.makeAuthenticatedRequest(`/user/${userId}/skills`);
+  }
+
+  async getUserExperience(userId) {
+    return await this.makeAuthenticatedRequest(`/user/${userId}/experience`);
+  }
+
+  async getUserEducation(userId) {
+    return await this.makeAuthenticatedRequest(`/user/${userId}/education`);
+  }
+
+  // Note: Job scoring is done locally, not via API
+  // These methods are kept for potential future API integration
+  async saveJobScoreToAPI(userId, jobScoreData) {
+    return await this.makeAuthenticatedRequest(`/user/${userId}/job-scores`, {
+      method: 'POST',
+      body: JSON.stringify(jobScoreData)
+    });
+  }
+}
+```
+
+**Message Interface**:
 ```javascript
 // Message handling interface
 {
-  type: 'AUTHENTICATE' | 'SCORE_JOB' | 'GET_HISTORY' | 'APPLY_JOB',
+  type: 'AUTHENTICATE' | 'SCORE_JOB' | 'GET_HISTORY' | 'APPLY_JOB' | 'GET_USER_PROFILE',
   payload: any,
   tabId?: number
 }
@@ -296,6 +503,180 @@ interface LinkedInJobData {
 **Purpose**: Handle OIDC authentication flow with Worko Cognito
 
 **Key Features**:
+- Initiate OIDC authorization flow using existing Worko Cognito configuration
+- Handle callback and token exchange
+- Manage token refresh
+- Secure token storage
+
+**AWS Amplify Integration**:
+Following the worko-ui-react implementation pattern, the extension will use AWS Amplify for Cognito OIDC authentication:
+
+```javascript
+// Amplify configuration for browser extension
+import { Amplify } from 'aws-amplify';
+import { signIn, signOut, getCurrentUser, fetchAuthSession } from 'aws-amplify/auth';
+
+const amplifyConfig = {
+  Auth: {
+    Cognito: {
+      userPoolId: process.env.WORKO_COGNITO_USER_POOL_ID,
+      userPoolClientId: process.env.WORKO_COGNITO_CLIENT_ID,
+      loginWith: {
+        oauth: {
+          domain: process.env.WORKO_COGNITO_DOMAIN,
+          scopes: ['openid', 'email', 'profile'],
+          redirectSignIn: [chrome.identity.getRedirectURL()],
+          redirectSignOut: [chrome.identity.getRedirectURL()],
+          responseType: 'code'
+        }
+      }
+    }
+  }
+};
+
+Amplify.configure(amplifyConfig);
+```
+
+**Authentication Flow**:
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant E as Extension
+    participant A as AWS Amplify
+    participant C as Worko Cognito
+    participant W as Worko API
+    
+    U->>E: Click Login
+    E->>A: signIn() with OAuth
+    A->>C: Redirect to Cognito Hosted UI
+    C->>U: Show Worko Login Form
+    U->>C: Enter Worko Credentials
+    C->>A: Authorization Code
+    A->>C: Exchange for Tokens
+    C->>A: Access & Refresh Tokens
+    A->>E: Authentication Success
+    E->>A: getCurrentUser()
+    A->>E: User Profile Data
+    E->>U: Show Dashboard
+```
+
+**Amplify Authentication Manager**:
+```javascript
+class AmplifyAuthManager {
+  async initializeAuth() {
+    try {
+      const user = await getCurrentUser();
+      const session = await fetchAuthSession();
+      return {
+        user,
+        accessToken: session.tokens?.accessToken?.toString(),
+        idToken: session.tokens?.idToken?.toString()
+      };
+    } catch (error) {
+      console.log('User not authenticated');
+      return null;
+    }
+  }
+
+  async signInWithOAuth() {
+    try {
+      // Use chrome.identity.launchWebAuthFlow for OAuth in extension
+      const authUrl = await this.buildOAuthUrl();
+      const responseUrl = await chrome.identity.launchWebAuthFlow({
+        url: authUrl,
+        interactive: true
+      });
+      
+      // Handle OAuth callback
+      return await this.handleOAuthCallback(responseUrl);
+    } catch (error) {
+      throw new Error(`Authentication failed: ${error.message}`);
+    }
+  }
+
+  async signOut() {
+    try {
+      await signOut();
+      // Clear extension storage
+      await chrome.storage.local.clear();
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
+  }
+
+  async refreshSession() {
+    try {
+      const session = await fetchAuthSession({ forceRefresh: true });
+      return session.tokens?.accessToken?.toString();
+    } catch (error) {
+      throw new Error('Token refresh failed');
+    }
+  }
+
+  private async buildOAuthUrl() {
+    const config = Amplify.getConfig();
+    const cognitoConfig = config.Auth?.Cognito;
+    
+    const params = new URLSearchParams({
+      client_id: cognitoConfig.userPoolClientId,
+      response_type: 'code',
+      scope: 'openid email profile',
+      redirect_uri: chrome.identity.getRedirectURL()
+    });
+    
+    return `${cognitoConfig.loginWith.oauth.domain}/oauth2/authorize?${params}`;
+  }
+
+  private async handleOAuthCallback(responseUrl) {
+    const url = new URL(responseUrl);
+    const code = url.searchParams.get('code');
+    
+    if (code) {
+      // Exchange code for tokens using Amplify
+      return await this.exchangeCodeForTokens(code);
+    } else {
+      throw new Error('Authorization code not found');
+    }
+  }
+}
+```
+
+**Token Storage & Management**:
+```javascript
+class TokenManager {
+  async storeTokens(tokens) {
+    // Store tokens securely in extension storage
+    await chrome.storage.local.set({
+      accessToken: tokens.accessToken,
+      idToken: tokens.idToken,
+      refreshToken: tokens.refreshToken,
+      expiresAt: Date.now() + (tokens.expiresIn * 1000)
+    });
+  }
+
+  async getValidToken() {
+    const result = await chrome.storage.local.get([
+      'accessToken', 'refreshToken', 'expiresAt'
+    ]);
+    
+    if (!result.accessToken) {
+      throw new Error('No access token found');
+    }
+    
+    // Check if token is expired
+    if (Date.now() >= result.expiresAt) {
+      // Refresh token
+      const authManager = new AmplifyAuthManager();
+      const newToken = await authManager.refreshSession();
+      return newToken;
+    }
+    
+    return result.accessToken;
+  }
+}
+```
+
+**Key Features**:
 - Initiate OIDC authorization flow
 - Handle callback and token exchange
 - Manage token refresh
@@ -382,16 +763,46 @@ interface JobData {
 ### Score Response
 ```javascript
 interface ScoreResponse {
-  score: number; // 0-100
+  matchingScore: number; // 0-100 overall score
   breakdown: {
-    skillsMatch: number;
-    experienceMatch: number;
-    locationMatch: number;
-    industryMatch: number;
+    experienceScore: number;
+    roleScore: number;
+    skillsScore: number;
+    educationScore: number;
+    industryScore: number;
+    responsibilitiesScore: number;
+    certificationsScore: number;
   };
-  recommendations: string[];
-  matchingKeywords: string[];
-  missingSkills: string[];
+  explanation: {
+    experience: string;
+    role: string;
+    skills: string;
+    education: string;
+    industry: string;
+    responsibilities: string;
+    certifications: string;
+  };
+  overallExplanation: string;
+}
+```
+
+### API Configuration
+```javascript
+interface APIConfig {
+  baseURL: string;
+  cognitoConfig: {
+    userPoolId: string;
+    clientId: string;
+    domain: string;
+    redirectUri: string;
+    responseType: 'code';
+    scope: 'openid email profile';
+  };
+  lambdaFunctions: {
+    jobMatching: 'worko-jd-resume-matching';
+    resumeParser: 'resume-parser';
+    jobDescriptionParser: 'worko-job-description-parser';
+  };
 }
 ```
 
@@ -462,8 +873,68 @@ interface ScoreResponse {
   "host_permissions": [
     "https://www.naukri.com/*",
     "https://www.linkedin.com/*",
-    "https://api.worko.ai/*"
+    "https://api.worko.ai/*",
+    "https://dev-api.worko.ai/*"
   ]
+}
+```
+
+### Dependencies & Environment Configuration
+
+**Required Dependencies**:
+```json
+{
+  "dependencies": {
+    "aws-amplify": "^6.0.0",
+    "jwt-decode": "^4.0.0"
+  }
+}
+```
+
+**Environment Configuration**:
+```javascript
+const CONFIG = {
+  production: {
+    apiBaseURL: 'https://api.worko.ai',
+    amplify: {
+      userPoolId: 'ap-south-1_PROD_POOL_ID',
+      userPoolClientId: 'PROD_CLIENT_ID',
+      cognitoDomain: 'https://worko-prod.auth.ap-south-1.amazoncognito.com'
+    }
+  },
+  development: {
+    apiBaseURL: 'https://dev-api.worko.ai',
+    amplify: {
+      userPoolId: 'ap-south-1_xGreJKkNc',
+      userPoolClientId: '16sh5s2bo3169886fdm8gtp0e4',
+      cognitoDomain: 'https://worko-dev.auth.ap-south-1.amazoncognito.com'
+    }
+  }
+};
+```
+
+**Manifest.json Configuration**:
+```json
+{
+  "manifest_version": 3,
+  "name": "Worko Job Matcher",
+  "version": "1.0.0",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "identity"
+  ],
+  "host_permissions": [
+    "https://www.naukri.com/*",
+    "https://www.linkedin.com/*",
+    "https://api.worko.ai/*",
+    "https://dev-api.worko.ai/*",
+    "https://*.auth.ap-south-1.amazoncognito.com/*"
+  ],
+  "oauth2": {
+    "client_id": "COGNITO_CLIENT_ID",
+    "scopes": ["openid", "email", "profile"]
+  }
 }
 ```
 
@@ -475,18 +946,47 @@ interface ScoreResponse {
 
 ## UI/UX Design Specifications
 
-### Color Scheme
+### Worko Brand Theme
+Following the existing Worko UI React application theme:
+
 ```css
 :root {
-  --worko-primary: #2563eb;      /* Blue */
-  --worko-success: #16a34a;      /* Green - >75% */
-  --worko-warning: #eab308;      /* Yellow - 50-74% */
-  --worko-amber: #f59e0b;        /* Amber - 30-49% */
-  --worko-danger: #dc2626;       /* Red - <30% */
+  /* Worko Brand Colors */
+  --worko-brand: #170155;           /* Primary brand color */
+  --worko-brand-bright: #22019c;    /* Bright brand variant */
+  --worko-primary: #316bff;         /* Primary blue */
+  --worko-secondary: #38a1d6;       /* Secondary blue */
+  --worko-gradient-from: #316bff;   /* Gradient start */
+  --worko-gradient-to: #38a1d6;     /* Gradient end */
+  
+  /* Score Color Coding */
+  --worko-success: #16a34a;         /* Green - >75% */
+  --worko-warning: #eab308;         /* Yellow - 50-74% */
+  --worko-amber: #f59e0b;           /* Amber - 30-49% */
+  --worko-danger: #dc2626;          /* Red - <30% */
+  
+  /* Background & Text */
   --worko-background: #ffffff;
   --worko-surface: #f8fafc;
-  --worko-text: #1e293b;
+  --worko-text: #213547;
   --worko-text-secondary: #64748b;
+  --worko-border: #e2e8f0;
+  
+  /* Dark Theme Support */
+  --worko-dark-bg: #121212;
+  --worko-dark-surface: #181818;
+  --worko-dark-text: #ffffff;
+  --worko-header-scrolled: rgba(255, 255, 255, 0.8);
+}
+
+/* Dark Theme */
+[data-theme='dark'] {
+  --worko-background: #121212;
+  --worko-surface: #181818;
+  --worko-text: #ffffff;
+  --worko-text-secondary: #a0a0a0;
+  --worko-border: #333333;
+  --worko-header-scrolled: rgb(0 8 39 / 80%);
 }
 ```
 
@@ -498,6 +998,48 @@ interface ScoreResponse {
 
 ### Component Specifications
 
+#### Worko Button Styles
+Following the existing Worko button design patterns:
+
+```css
+.btn_primary {
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  border-radius: 8px;
+  border: 1px solid #4b7eff;
+  background: linear-gradient(to bottom, #316bff, #38a1d6);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: white;
+}
+
+.btn_primary:hover {
+  background: linear-gradient(to bottom, #2857cf, #2c7da5);
+}
+
+.btn_primary:active {
+  transform: scale(0.95);
+}
+
+.btn_secondary {
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid var(--worko-border);
+  background: transparent;
+  color: var(--worko-text);
+  transition: all 0.2s ease-in-out;
+}
+
+.btn_secondary:hover {
+  background: var(--worko-surface);
+  border-color: var(--worko-primary);
+}
+```
+
 #### Score Badge
 ```css
 .score-badge {
@@ -507,12 +1049,29 @@ interface ScoreResponse {
   border-radius: 12px;
   font-weight: 600;
   font-size: 11px;
+  transition: all 0.3s ease-in-out;
 }
 
-.score-green { background: #dcfce7; color: #166534; }
-.score-yellow { background: #fef3c7; color: #92400e; }
-.score-amber { background: #fed7aa; color: #9a3412; }
-.score-red { background: #fecaca; color: #991b1b; }
+.score-green { 
+  background: #dcfce7; 
+  color: #166534; 
+  border: 1px solid #16a34a;
+}
+.score-yellow { 
+  background: #fef3c7; 
+  color: #92400e; 
+  border: 1px solid #eab308;
+}
+.score-amber { 
+  background: #fed7aa; 
+  color: #9a3412; 
+  border: 1px solid #f59e0b;
+}
+.score-red { 
+  background: #fecaca; 
+  color: #991b1b; 
+  border: 1px solid #dc2626;
+}
 ```
 
 #### Job History Item
@@ -520,14 +1079,42 @@ interface ScoreResponse {
 .job-item {
   padding: 12px;
   border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--worko-border);
   margin-bottom: 8px;
-  background: white;
+  background: var(--worko-background);
+  transition: all 0.3s ease-in-out;
 }
 
 .job-item:hover {
   border-color: var(--worko-primary);
-  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 4px 8px rgba(49, 107, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.job-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.job-title {
+  font-weight: 600;
+  color: var(--worko-text);
+  font-size: 14px;
+}
+
+.job-company {
+  color: var(--worko-text-secondary);
+  font-size: 12px;
+}
+
+.job-platform {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--worko-surface);
+  color: var(--worko-text-secondary);
 }
 ```
 

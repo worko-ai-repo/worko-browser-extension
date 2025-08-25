@@ -1,0 +1,1342 @@
+/* Content Script Styles for Worko Job Matcher */
+/* These styles are injected into job platform pages */
+
+/* Worko Brand Colors */
+:root {
+  --worko-brand: #170155;
+  --worko-primary: #316bff;
+  --worko-secondary: #38a1d6;
+  --worko-success: #16a34a;
+  --worko-warning: #eab308;
+  --worko-amber: #f59e0b;
+  --worko-danger: #dc2626;
+  --worko-background: #ffffff;
+  --worko-surface: #f8fafc;
+  --worko-text: #213547;
+  --worko-text-secondary: #64748b;
+  --worko-border: #e2e8f0;
+}
+
+/* Naukri Integration Styles */
+.worko-job-matcher {
+  background: linear-gradient(135deg, var(--worko-primary), var(--worko-secondary));
+  border-radius: 12px;
+  margin: 16px 0;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(49, 107, 255, 0.15);
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  position: relative;
+  z-index: 1000;
+}
+
+.worko-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.worko-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.worko-icon {
+  font-size: 20px;
+}
+
+.worko-btn-primary {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.worko-btn-primary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.worko-btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.worko-btn-secondary {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.worko-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.worko-results {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.worko-score-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
+}
+
+.worko-score-value {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.worko-score-label {
+  font-size: 12px;
+  opacity: 0.8;
+  margin-top: 2px;
+}
+
+.worko-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Score Color Classes */
+.worko-score-green .worko-score-value {
+  color: #22c55e;
+}
+
+.worko-score-yellow .worko-score-value {
+  color: #fbbf24;
+}
+
+.worko-score-amber .worko-score-value {
+  color: #f59e0b;
+}
+
+.worko-score-red .worko-score-value {
+  color: #ef4444;
+}
+
+/* LinkedIn Integration Styles */
+.worko-job-matcher-linkedin {
+  background: var(--worko-background);
+  border: 2px solid var(--worko-primary);
+  border-radius: 12px;
+  margin: 16px 0;
+  box-shadow: 0 4px 12px rgba(49, 107, 255, 0.1);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  position: relative;
+  z-index: 1000;
+}
+
+.worko-linkedin-banner {
+  padding: 16px;
+}
+
+.worko-linkedin-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.worko-linkedin-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--worko-brand);
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.worko-linkedin-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.worko-linkedin-btn-primary {
+  background: linear-gradient(to bottom, var(--worko-primary), var(--worko-secondary));
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.worko-linkedin-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(to bottom, #2857cf, #2c7da5);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(49, 107, 255, 0.3);
+}
+
+.worko-linkedin-btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.worko-linkedin-btn-secondary {
+  background: transparent;
+  border: 1px solid var(--worko-border);
+  color: var(--worko-text);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.worko-linkedin-btn-secondary:hover {
+  background: var(--worko-surface);
+  border-color: var(--worko-primary);
+}
+
+.worko-linkedin-btn-apply {
+  background: var(--worko-success);
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.worko-linkedin-btn-apply:hover {
+  background: #15803d;
+  transform: translateY(-1px);
+}
+
+/* LinkedIn Score Display */
+.worko-score-display {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.worko-score-display.worko-score-green {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid var(--worko-success);
+}
+
+.worko-score-display.worko-score-yellow {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid var(--worko-warning);
+}
+
+.worko-score-display.worko-score-amber {
+  background: #fed7aa;
+  color: #9a3412;
+  border: 1px solid var(--worko-amber);
+}
+
+.worko-score-display.worko-score-red {
+  background: #fecaca;
+  color: #991b1b;
+  border: 1px solid var(--worko-danger);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .worko-banner,
+  .worko-linkedin-content {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+  
+  .worko-results {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .worko-linkedin-actions {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+/* Animation for smooth appearance */
+.worko-job-matcher,
+.worko-job-matcher-linkedin {
+  animation: workoFadeIn 0.5s ease-out;
+}
+
+@keyframes workoFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ensure our styles don't conflict with page styles */
+.worko-job-matcher *,
+.worko-job-matcher-linkedin * {
+  box-sizing: border-box;
+}
+
+/* High specificity to override page styles */
+div.worko-job-matcher button,
+div.worko-job-matcher-linkedin button {
+  font-family: inherit !important;
+  outline: none !important;
+}
+
+div.worko-job-matcher button:focus,
+div.worko-job-matcher-linkedin button:focus {
+  outline: 2px solid rgba(49, 107, 255, 0.5) !important;
+  outline-offset: 2px !important;
+}/* 
+Job Card UI Styles for Listing Pages */
+.worko-job-card-ui {
+  background: linear-gradient(135deg, #f8f9ff 0%, #e8f2ff 100%) !important;
+  border: 1px solid #e1e8ff !important;
+  border-radius: 8px !important;
+  margin: 4px !important;
+  padding: 8px 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  transition: all 0.2s ease !important;
+  position: relative !important;
+  z-index: 1000 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  min-width: 140px !important;
+  max-width: 200px !important;
+}
+
+.worko-job-card-ui:hover {
+  background: linear-gradient(135deg, #f0f4ff 0%, #dbeafe 100%) !important;
+  border-color: #c7d2fe !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 8px rgba(49, 107, 255, 0.1) !important;
+}
+
+.worko-score-job-btn {
+  background: linear-gradient(135deg, #170155 0%, #316bff 100%) !important;
+  color: white !important;
+  border: none !important;
+  padding: 6px 12px !important;
+  border-radius: 4px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  white-space: nowrap !important;
+  min-width: 80px !important;
+  text-align: center !important;
+}
+
+.worko-score-job-btn:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(49, 107, 255, 0.3) !important;
+}
+
+.worko-score-job-btn:disabled {
+  opacity: 0.7 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+.worko-score-job-btn:active {
+  transform: translateY(0) !important;
+}
+
+/* Ensure job card UI doesn't interfere with existing layouts */
+.jobTuple .worko-job-card-ui,
+.job-card .worko-job-card-ui,
+.srp-jobtuple-wrapper .worko-job-card-ui {
+  margin-top: 8px !important;
+  margin-bottom: 4px !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .worko-job-card-ui {
+    padding: 6px !important;
+    gap: 6px !important;
+  }
+  
+  .worko-score-job-btn {
+    padding: 4px 8px !important;
+    font-size: 10px !important;
+    min-width: 70px !important;
+  }
+}
+
+/* Animation for score updates */
+@keyframes scoreUpdate {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.worko-score-job-btn.score-updated {
+  animation: scoreUpdate 0.3s ease-in-out !important;
+}/* Ab
+solutely positioned job card UI */
+.worko-job-card-ui[style*="position: absolute"] {
+  margin: 0 !important;
+  backdrop-filter: blur(2px) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Debug styles for job card detection */
+.worko-debug-highlight {
+  outline: 2px dashed #ff0000 !important;
+  outline-offset: 2px !important;
+}/* 
+===== WORKO SIDEBAR STYLES ===== */
+
+/* CSS Variables - Worko Theme */
+:root {
+  --worko-brand: #170155;
+  --worko-brand-bright: #22019c;
+  --worko-primary: #316bff;
+  --worko-secondary: #38a1d6;
+  --worko-gradient-from: #316bff;
+  --worko-gradient-to: #38a1d6;
+  
+  --worko-success: #16a34a;
+  --worko-warning: #eab308;
+  --worko-amber: #f59e0b;
+  --worko-danger: #dc2626;
+  
+  --worko-background: #ffffff;
+  --worko-surface: #f8fafc;
+  --worko-text: #213547;
+  --worko-text-secondary: #64748b;
+  --worko-border: #e2e8f0;
+  
+  --font-family: 'Poppins', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --font-size-xs: 10px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 20px;
+  --spacing-2xl: 24px;
+  
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+}
+
+/* Sidebar Container */
+.worko-sidebar-container {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2147483647; /* Maximum z-index */
+  pointer-events: none;
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  color: var(--worko-text);
+  
+  /* Ensure clean styling */
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  outline: none;
+  text-decoration: none;
+  list-style: none;
+  
+  /* Reset any inherited styles */
+  font-weight: normal;
+  font-style: normal;
+  text-align: left;
+  text-transform: none;
+  letter-spacing: normal;
+  word-spacing: normal;
+  text-shadow: none;
+  box-shadow: none;
+  border-radius: 0;
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: none;
+}
+
+.worko-sidebar-container * {
+  box-sizing: border-box;
+}
+
+/* Sidebar Overlay */
+.worko-sidebar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.worko-sidebar-container.worko-sidebar-open .worko-sidebar-overlay {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Sidebar Panel */
+.worko-sidebar-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 420px;
+  height: 100%;
+  background: var(--worko-background);
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+  transform: translateX(100%);
+  transition: transform 0.3s ease-in-out;
+  pointer-events: all;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.worko-sidebar-container.worko-sidebar-open .worko-sidebar-panel {
+  transform: translateX(0);
+}
+
+/* Sidebar Header */
+.worko-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-xl);
+  border-bottom: 1px solid var(--worko-border);
+  background: var(--worko-surface);
+  flex-shrink: 0;
+}
+
+.worko-sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.worko-logo-icon {
+  width: 48px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.worko-logo-text {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--worko-brand);
+}
+
+.worko-sidebar-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--worko-text-secondary);
+  font-size: 24px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease-in-out;
+}
+
+.worko-sidebar-close:hover {
+  background: var(--worko-surface);
+  color: var(--worko-text);
+}
+
+/* Sidebar Content */
+.worko-sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-xl);
+}
+
+.worko-sidebar-view {
+  display: block;
+}
+
+/* User Section */
+.worko-user-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-lg);
+  background: var(--worko-surface);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.worko-user-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex: 1;
+}
+
+.worko-user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--worko-border);
+}
+
+.worko-user-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.worko-user-details span {
+  font-weight: 500;
+  color: var(--worko-text);
+}
+
+.worko-resume-link {
+  font-size: var(--font-size-xs);
+  color: var(--worko-primary);
+  text-decoration: none;
+}
+
+.worko-resume-link:hover {
+  text-decoration: underline;
+}
+
+/* Welcome Section */
+.worko-welcome-section {
+  text-align: center;
+  padding: var(--spacing-2xl) 0;
+}
+
+.worko-welcome-section h2 {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--worko-brand);
+  margin-bottom: var(--spacing-md);
+}
+
+.worko-welcome-section p {
+  color: var(--worko-text-secondary);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.worko-auth-note {
+  margin-top: var(--spacing-lg);
+  font-size: var(--font-size-xs);
+  color: var(--worko-text-secondary);
+}
+
+/* Job Detection Section */
+.worko-job-detection {
+  background: var(--worko-surface);
+  border: 1px solid var(--worko-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.worko-job-detection-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.worko-job-detection-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex: 1;
+}
+
+.worko-job-detection-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.worko-job-detection-content h4 {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--worko-text);
+}
+
+.worko-job-detection-content p {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--worko-text-secondary);
+  line-height: 1.3;
+}
+
+.worko-job-detection-status {
+  display: flex;
+  align-items: center;
+}
+
+.worko-status-indicator {
+  font-size: 18px;
+}
+
+/* Applications Section */
+.worko-applications-section {
+  margin-bottom: var(--spacing-xl);
+}
+
+.worko-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.worko-section-header h3 {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--worko-text);
+}
+
+.worko-job-applications {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.worko-job-item {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--worko-border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-sm);
+  background: var(--worko-background);
+  transition: all 0.2s ease-in-out;
+}
+
+.worko-job-item:hover {
+  border-color: var(--worko-primary);
+  box-shadow: 0 2px 8px rgba(49, 107, 255, 0.15);
+}
+
+.worko-job-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-xs);
+}
+
+.worko-job-info {
+  flex: 1;
+}
+
+.worko-job-title {
+  font-weight: 600;
+  color: var(--worko-text);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-xs);
+}
+
+.worko-job-company {
+  color: var(--worko-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.worko-job-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--spacing-xs);
+}
+
+/* Empty State */
+.worko-empty-state {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  color: var(--worko-text-secondary);
+}
+
+.worko-empty-state p {
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-xs);
+}
+
+.worko-empty-state small {
+  font-size: var(--font-size-xs);
+}
+
+/* Button Styles */
+.worko-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  border: 1px solid #4b7eff;
+  border-radius: var(--radius-md);
+  background: linear-gradient(to bottom, var(--worko-gradient-from), var(--worko-gradient-to));
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  min-height: 48px;
+  font-family: var(--font-family);
+}
+
+.worko-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(to bottom, #2857cf, #2c7da5);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(49, 107, 255, 0.3);
+}
+
+.worko-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.worko-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  border: 1px solid var(--worko-border);
+  border-radius: var(--radius-md);
+  background: var(--worko-background);
+  color: var(--worko-text);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  min-height: 40px;
+  font-family: var(--font-family);
+}
+
+.worko-btn-secondary:hover {
+  background: var(--worko-surface);
+  border-color: var(--worko-primary);
+}
+
+.worko-btn-small {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-xs);
+  min-height: 28px;
+}
+
+.worko-btn-tiny {
+  padding: var(--spacing-xs);
+  font-size: var(--font-size-xs);
+  min-height: 24px;
+}
+
+.worko-btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm);
+  border: none;
+  background: transparent;
+  color: var(--worko-primary);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  font-family: var(--font-family);
+}
+
+.worko-btn-back:hover {
+  color: var(--worko-brand);
+}
+
+.worko-btn-refresh {
+  background: var(--worko-surface);
+  border: 1px solid var(--worko-border);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-xs);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-family);
+}
+
+.worko-btn-refresh:hover {
+  background: var(--worko-primary);
+  color: white;
+  border-color: var(--worko-primary);
+  transform: rotate(90deg);
+}
+
+.worko-full-width {
+  width: 100%;
+}
+
+/* Score Badge */
+.worko-score-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  font-size: var(--font-size-xs);
+  transition: all 0.3s ease-in-out;
+}
+
+.worko-score-excellent {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  color: #166534;
+  border: 1px solid #10b981;
+}
+
+.worko-score-good {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: #1e40af;
+  border: 1px solid #3b82f6;
+}
+
+.worko-score-average {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+  border: 1px solid #f59e0b;
+}
+
+.worko-score-poor {
+  background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%);
+  color: #991b1b;
+  border: 1px solid #ef4444;
+}
+
+/* Status Badge */
+.worko-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.worko-status-applied {
+  background: #e0f2fe;
+  color: #0277bd;
+  border: 1px solid #81d4fa;
+}
+
+.worko-status-rejected {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ef9a9a;
+}
+
+.worko-status-shortlisted {
+  background: #f3e5f5;
+  color: #7b1fa2;
+  border: 1px solid #ce93d8;
+}
+
+/* Loading Spinner */
+.worko-loading-spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--worko-surface);
+  border-top: 2px solid var(--worko-primary);
+  border-radius: 50%;
+  animation: worko-spin 1s linear infinite;
+}
+
+@keyframes worko-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Progress Container */
+.worko-progress-container {
+  text-align: center;
+  padding: var(--spacing-2xl);
+}
+
+.worko-progress-steps {
+  margin-bottom: var(--spacing-xl);
+}
+
+.worko-step {
+  padding: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  color: var(--worko-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.worko-step.active {
+  color: var(--worko-primary);
+  font-weight: 500;
+}
+
+.worko-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--worko-surface);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-bottom: var(--spacing-lg);
+}
+
+.worko-progress-fill {
+  height: 100%;
+  background: linear-gradient(to right, var(--worko-gradient-from), var(--worko-gradient-to));
+  border-radius: var(--radius-sm);
+  transition: width 0.3s ease-in-out;
+  width: 0%;
+}
+
+.worko-progress-text {
+  color: var(--worko-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* Results Section */
+.worko-results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.worko-job-info {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.worko-job-info h3 {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--worko-text);
+  margin-bottom: var(--spacing-xs);
+}
+
+.worko-job-info p {
+  color: var(--worko-text-secondary);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-xs);
+}
+
+/* Overall Explanation */
+.worko-overall-explanation {
+  margin: var(--spacing-md) 0;
+}
+
+.worko-explanation-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: linear-gradient(135deg, #f8f9ff 0%, #e8f2ff 100%);
+  border-radius: var(--radius-md);
+  border: 1px solid #e1e8ff;
+}
+
+.worko-explanation-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.worko-explanation-content h4 {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--worko-text);
+}
+
+.worko-explanation-content p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--worko-text-secondary);
+  line-height: 1.4;
+}
+
+/* Score Breakdown */
+.worko-score-breakdown {
+  margin: var(--spacing-lg) 0;
+}
+
+.worko-score-breakdown h4 {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+  color: var(--worko-text);
+}
+
+.worko-breakdown-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.worko-breakdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--worko-surface);
+  border-radius: var(--radius-sm);
+  border-left: 4px solid var(--worko-primary);
+  transition: all 0.2s ease-in-out;
+}
+
+.worko-breakdown-item:hover {
+  background: #f8f9ff;
+  transform: translateX(2px);
+}
+
+.worko-breakdown-content {
+  flex: 1;
+}
+
+.worko-breakdown-label {
+  font-weight: 500;
+  color: var(--worko-text);
+  margin-bottom: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+}
+
+.worko-breakdown-explanation {
+  font-size: var(--font-size-xs);
+  color: var(--worko-text-secondary);
+  line-height: 1.3;
+}
+
+.worko-breakdown-score {
+  font-weight: 600;
+  font-size: var(--font-size-base);
+  color: var(--worko-primary);
+  margin-left: var(--spacing-md);
+}
+
+/* Skills Analysis */
+.worko-skills-analysis {
+  margin: var(--spacing-lg) 0;
+}
+
+.worko-matching-skills,
+.worko-missing-skills {
+  margin-bottom: var(--spacing-md);
+}
+
+.worko-matching-skills h4,
+.worko-missing-skills h4 {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+  color: var(--worko-text);
+}
+
+.worko-skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
+}
+
+.worko-skill-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--worko-surface);
+  border: 1px solid var(--worko-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  color: var(--worko-text);
+  transition: all 0.2s ease-in-out;
+}
+
+.worko-skill-tag.worko-matching {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  border-color: #16a34a;
+  color: #15803d;
+}
+
+.worko-skill-tag.worko-matching::before {
+  content: '✓';
+  margin-right: var(--spacing-xs);
+  font-weight: 600;
+}
+
+.worko-skill-tag.worko-missing {
+  background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+  border-color: #dc2626;
+  color: #b91c1c;
+}
+
+.worko-skill-tag.worko-missing::before {
+  content: '+';
+  margin-right: var(--spacing-xs);
+  font-weight: 600;
+}
+
+.worko-skills-empty {
+  padding: var(--spacing-md);
+  text-align: center;
+  color: var(--worko-text-secondary);
+  font-style: italic;
+  background: var(--worko-surface);
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--worko-border);
+  font-size: var(--font-size-xs);
+}
+
+/* Actions */
+.worko-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--worko-border);
+}
+
+.worko-actions .worko-btn-primary,
+.worko-actions .worko-btn-secondary {
+  flex: 1;
+}
+
+/* Error State */
+.worko-error-content {
+  text-align: center;
+  padding: var(--spacing-2xl);
+}
+
+.worko-error-icon {
+  font-size: 48px;
+  margin-bottom: var(--spacing-lg);
+}
+
+.worko-error-content h3 {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--worko-text);
+  margin-bottom: var(--spacing-sm);
+}
+
+.worko-error-content p {
+  color: var(--worko-text-secondary);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Scrollbar Styling */
+.worko-sidebar-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.worko-sidebar-content::-webkit-scrollbar-track {
+  background: var(--worko-surface);
+}
+
+.worko-sidebar-content::-webkit-scrollbar-thumb {
+  background: var(--worko-border);
+  border-radius: var(--radius-sm);
+}
+
+.worko-sidebar-content::-webkit-scrollbar-thumb:hover {
+  background: var(--worko-text-secondary);
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .worko-sidebar-panel {
+    width: 100vw;
+  }
+}
+
+/* Animation for sidebar toggle button */
+.worko-sidebar-toggle {
+  position: fixed;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, var(--worko-gradient-from), var(--worko-gradient-to));
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(49, 107, 255, 0.3);
+  z-index: 2147483646;
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.worko-sidebar-toggle:hover {
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 6px 16px rgba(49, 107, 255, 0.4);
+}
+
+.worko-sidebar-toggle.worko-sidebar-open {
+  background: var(--worko-danger);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+/* ===== END WORKO SIDEBAR STYLES ===== */
