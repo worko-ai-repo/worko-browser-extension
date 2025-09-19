@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -10,7 +11,7 @@ module.exports = (env, argv) => {
     entry: {
       background: './src/background/background.ts',
       popup: ['./src/popup/popup.ts', './src/popup/popup.css'],
-      'content-naukri': ['./src/content/content-naukri.ts', './src/content/content-styles.css'],
+      'content-naukri': ['./src/content/content-naukri-fixed.ts', './src/content/content-styles.css'],
       'content-linkedin': ['./src/content/content-linkedin.ts', './src/content/content-styles.css']
     },
     
@@ -61,10 +62,31 @@ module.exports = (env, argv) => {
         '@shared': path.resolve(__dirname, 'src/shared'),
         '@types': path.resolve(__dirname, 'src/types'),
         '@utils': path.resolve(__dirname, 'src/utils')
+      },
+      fallback: {
+        "process": false,
+        "buffer": false,
+        "crypto": false,
+        "stream": false,
+        "assert": false,
+        "http": false,
+        "https": false,
+        "os": false,
+        "url": false,
+        "zlib": false
       }
     },
     
     plugins: [
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development'),
+        'process.env.WORKO_COGNITO_USER_POOL_ID': JSON.stringify(process.env.WORKO_COGNITO_USER_POOL_ID || 'PROD_USER_POOL_ID_PLACEHOLDER'),
+        'process.env.WORKO_COGNITO_CLIENT_ID': JSON.stringify(process.env.WORKO_COGNITO_CLIENT_ID || 'PROD_CLIENT_ID_PLACEHOLDER'),
+        'process.env': JSON.stringify({
+          NODE_ENV: isProduction ? 'production' : 'development'
+        })
+      }),
+      
       new CopyWebpackPlugin({
         patterns: [
           {

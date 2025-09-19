@@ -1339,4 +1339,577 @@ solutely positioned job card UI */
   box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
 }
 
-/* ===== END WORKO SIDEBAR STYLES ===== */
+/* ===== END WORKO SIDEBAR STYLES ===== *//* Wo
+rko Details Modal Styles */
+.worko-details-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999999;
+  font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+}
+
+.worko-modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.worko-modal-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.worko-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.worko-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #170155;
+}
+
+.worko-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #64748b;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.worko-modal-close:hover {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.worko-modal-body {
+  padding: 24px;
+}
+
+.worko-overall-score {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.worko-score-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #316bff, #38a1d6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.worko-score-number {
+  color: white;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.worko-overall-explanation {
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.worko-breakdown-section {
+  margin-bottom: 32px;
+}
+
+.worko-breakdown-section h4 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #170155;
+}
+
+.worko-breakdown-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.worko-breakdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.worko-breakdown-label {
+  min-width: 80px;
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.worko-breakdown-bar {
+  flex: 1;
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.worko-breakdown-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #316bff, #38a1d6);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.worko-breakdown-score {
+  min-width: 40px;
+  text-align: right;
+  font-size: 13px;
+  font-weight: 600;
+  color: #170155;
+}
+
+.worko-skills-section {
+  margin-bottom: 24px;
+}
+
+.worko-skills-section h4 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #170155;
+}
+
+.worko-skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.worko-skill-tag {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.worko-skill-match {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.worko-skill-missing {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+/* LinkedIn Banner Logo Styles */
+.worko-logo-img {
+  border-radius: 4px;
+  object-fit: contain;
+}
+
+/* Responsive modal */
+@media (max-width: 640px) {
+  .worko-modal-content {
+    margin: 10px;
+    max-height: 90vh;
+  }
+  
+  .worko-modal-header,
+  .worko-modal-body {
+    padding: 16px;
+  }
+  
+  .worko-breakdown-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  
+  .worko-breakdown-label {
+    min-width: auto;
+  }
+  
+  .worko-breakdown-bar {
+    width: 100%;
+  }
+}/* 
+Job Detail UI Styles for NaukriGulf and Naukri individual job pages */
+.worko-job-detail-ui {
+  margin: 16px 0;
+  z-index: 1000;
+  position: relative;
+}
+
+.worko-job-detail-banner {
+  background: linear-gradient(135deg, var(--worko-primary), var(--worko-secondary));
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(49, 107, 255, 0.15);
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.worko-job-detail-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.worko-job-detail-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.worko-job-detail-logo .worko-icon {
+  font-size: 20px;
+}
+
+.worko-job-detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.worko-job-detail-btn-primary {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.worko-job-detail-btn-primary:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.worko-job-detail-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.worko-job-detail-btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.worko-job-detail-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.worko-job-detail-btn-apply {
+  background: var(--worko-success);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.worko-job-detail-btn-apply:hover {
+  background: #15803d;
+  transform: translateY(-1px);
+}
+
+.worko-score-display {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--worko-text);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.worko-score-display.worko-score-green {
+  background: var(--worko-success);
+  color: white;
+}
+
+.worko-score-display.worko-score-yellow {
+  background: var(--worko-warning);
+  color: white;
+}
+
+.worko-score-display.worko-score-amber {
+  background: var(--worko-amber);
+  color: white;
+}
+
+.worko-score-display.worko-score-red {
+  background: var(--worko-danger);
+  color: white;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .worko-job-detail-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  
+  .worko-job-detail-actions {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .worko-job-detail-logo {
+    justify-content: center;
+  }
+}
+
+/* Ensure the UI doesn't interfere with existing page elements */
+.worko-job-detail-ui * {
+  box-sizing: border-box;
+}
+
+/* Animation for score display */
+.worko-score-display {
+  animation: worko-score-appear 0.3s ease-out;
+}
+
+@keyframes worko-score-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+/* Na
+ukri Integration Styles - Enhanced to match LinkedIn */
+.worko-job-matcher-naukri {
+  background: var(--worko-background);
+  border: 2px solid var(--worko-primary);
+  border-radius: 12px;
+  margin: 16px 0;
+  box-shadow: 0 4px 12px rgba(49, 107, 255, 0.1);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  position: relative;
+  z-index: 1000;
+}
+
+.worko-naukri-banner {
+  padding: 16px;
+}
+
+.worko-naukri-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.worko-naukri-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--worko-brand);
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.worko-naukri-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.worko-naukri-btn-primary {
+  background: linear-gradient(to bottom, var(--worko-primary), var(--worko-secondary));
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.worko-naukri-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(to bottom, #2857cf, #2c7da5);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(49, 107, 255, 0.3);
+}
+
+.worko-naukri-btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.worko-naukri-btn-secondary {
+  background: transparent;
+  border: 1px solid var(--worko-border);
+  color: var(--worko-text);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.worko-naukri-btn-secondary:hover {
+  background: var(--worko-surface);
+  border-color: var(--worko-primary);
+}
+
+.worko-naukri-btn-apply {
+  background: var(--worko-success);
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.worko-naukri-btn-apply:hover {
+  background: #15803d;
+  transform: translateY(-1px);
+}
+
+/* Responsive Design for Naukri */
+@media (max-width: 768px) {
+  .worko-naukri-content {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+  
+  .worko-naukri-actions {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+/* Animation for Naukri UI */
+.worko-job-matcher-naukri {
+  animation: workoFadeIn 0.5s ease-out;
+}
+
+/* Ensure Naukri styles don't conflict with page styles */
+.worko-job-matcher-naukri * {
+  box-sizing: border-box;
+}
+
+/* High specificity to override page styles */
+div.worko-job-matcher-naukri button {
+  font-family: inherit !important;
+  outline: none !important;
+}
+
+div.worko-job-matcher-naukri button:focus {
+  outline: 2px solid rgba(49, 107, 255, 0.5) !important;
+  outline-offset: 2px !important;
+}/* Bette
+r integration within job info sections */
+.worko-job-matcher-naukri {
+  margin: 16px 0 !important;
+  max-width: 100% !important;
+}
+
+/* When inside job info containers, adjust spacing */
+.jd-header .worko-job-matcher-naukri,
+.job-header .worko-job-matcher-naukri,
+.vacancy-header .worko-job-matcher-naukri,
+.job-details-header .worko-job-matcher-naukri {
+  margin-top: 12px !important;
+  margin-bottom: 16px !important;
+}
+
+/* Ensure it doesn't break existing layouts */
+.worko-job-matcher-naukri {
+  clear: both !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 768px) {
+  .worko-job-matcher-naukri {
+    margin: 12px 0 !important;
+  }
+  
+  .worko-naukri-banner {
+    padding: 12px !important;
+  }
+}
+/*
+ Additional DOM insertion safety fixes */
+.worko-job-matcher-naukri {
+  display: block !important;
+  position: relative !important;
+  box-sizing: border-box !important;
+}
+
+/* Handle different parent containers gracefully */
+body > .worko-job-matcher-naukri {
+  margin: 16px auto !important;
+  max-width: 1200px !important;
+}
+
+/* Ensure banner doesn't interfere with page layout */
+.worko-job-matcher-naukri {
+  float: none !important;
+  clear: both !important;
+  z-index: 1000 !important;
+}

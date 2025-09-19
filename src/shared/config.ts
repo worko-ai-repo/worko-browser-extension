@@ -1,7 +1,7 @@
 import { ExtensionConfig } from '@/types';
 
-// Environment detection
-const isDevelopment = process.env.NODE_ENV === 'development';
+// Environment detection - use development by default for browser extension
+const isDevelopment = process.env.NODE_ENV !== 'production';
 
 // Base configuration
 export const CONFIG: ExtensionConfig = {

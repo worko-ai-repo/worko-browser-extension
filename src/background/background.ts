@@ -373,10 +373,11 @@ async function handleScoreJob(payload: any): Promise<ExtensionResponse> {
     console.log('Starting job scoring process...');
     console.log('Received payload:', payload);
     
-    const { jobData } = payload;
+    // Handle both formats: direct jobData or nested under payload.jobData
+    const jobData = payload.jobData || payload;
     
-    if (!jobData) {
-      console.error('No jobData in payload:', payload);
+    if (!jobData || !jobData.title) {
+      console.error('No valid jobData in payload:', payload);
       throw new Error('No job data provided for scoring');
     }
     

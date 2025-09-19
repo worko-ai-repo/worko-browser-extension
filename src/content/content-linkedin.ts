@@ -6,6 +6,9 @@ import { PLATFORM_CONFIG } from '@shared/config';
 
 console.log('Worko Extension: LinkedIn content script loaded');
 
+// Store the latest scoring results
+let latestScoringResults: any = null;
+
 // Check if we're on a LinkedIn job page
 const isJobPage = (): boolean => {
   return window.location.href.includes('/jobs/view/') || 
@@ -18,20 +21,71 @@ const extractJobData = (): JobData | null => {
   try {
     const selectors = PLATFORM_CONFIG.linkedin.selectors;
     
-    // LinkedIn uses dynamic loading, so we need to wait for content
-    const titleElement = document.querySelector(selectors.jobTitle) as HTMLElement;
-    const companyElement = document.querySelector(selectors.company) as HTMLElement;
+    // Try multiple selectors for job title (LinkedIn changes these frequently)
+    const titleSelectors = [
+      selectors.jobTitle,
+      '.job-details-jobs-unified-top-card__job-title',
+      '.jobs-unified-top-card__job-title',
+      '.job-details-jobs-unified-top-card__job-title a',
+      '.jobs-unified-top-card__job-title a',
+      'h1[data-test-id="job-title"]',
+      '.job-details-jobs-unified-top-card__job-title-link'
+    ];
+    
+    const companySelectors = [
+      selectors.company,
+      '.job-details-jobs-unified-top-card__company-name',
+      '.jobs-unified-top-card__company-name',
+      '.job-details-jobs-unified-top-card__company-name a',
+      '.jobs-unified-top-card__company-name a',
+      '[data-test-id="job-details-company-name"]'
+    ];
+    
+    let titleElement: HTMLElement | null = null;
+    let companyElement: HTMLElement | null = null;
+    
+    // Try to find title element
+    for (const selector of titleSelectors) {
+      titleElement = document.querySelector(selector) as HTMLElement;
+      if (titleElement && titleElement.textContent?.trim()) {
+        break;
+      }
+    }
+    
+    // Try to find company element
+    for (const selector of companySelectors) {
+      companyElement = document.querySelector(selector) as HTMLElement;
+      if (companyElement && companyElement.textContent?.trim()) {
+        break;
+      }
+    }
     
     if (!titleElement || !companyElement) {
       console.log('Required LinkedIn job elements not found, retrying...');
+      console.log('Title element:', titleElement);
+      console.log('Company element:', companyElement);
       return null;
     }
     
     // Extract job description from multiple possible locations
-    const descriptionElement = document.querySelector(selectors.description) || 
-                              document.querySelector('.job-details-jobs-unified-top-card__job-description-snippet') ||
-                              document.querySelector('.jobs-description__content') ||
-                              document.querySelector('.jobs-box__html-content');
+    const descriptionSelectors = [
+      selectors.description,
+      '.job-details-jobs-unified-top-card__job-description-snippet',
+      '.jobs-description__content',
+      '.jobs-box__html-content',
+      '.job-details-jobs-unified-top-card__job-description',
+      '.jobs-description-content__text',
+      '[data-test-id="job-details-description"]',
+      '.job-details-module'
+    ];
+    
+    let descriptionElement: HTMLElement | null = null;
+    for (const selector of descriptionSelectors) {
+      descriptionElement = document.querySelector(selector) as HTMLElement;
+      if (descriptionElement && descriptionElement.textContent?.trim()) {
+        break;
+      }
+    }
     
     const locationElement = document.querySelector(selectors.location) ||
                            document.querySelector('.job-details-jobs-unified-top-card__primary-description-container');
@@ -182,7 +236,7 @@ const injectWorkoUI = (): void => {
     <div class="worko-linkedin-banner">
       <div class="worko-linkedin-content">
         <div class="worko-linkedin-logo">
-          <span class="worko-icon">🚀</span>
+          <img src="${chrome.runtime.getURL('icons/32.png')}" alt="Worko" class="worko-logo-img" style="width: 24px; height: 24px; margin-right: 8px; border-radius: 4px;">
           <span class="worko-text">Worko Match</span>
         </div>
         <div class="worko-linkedin-actions">
@@ -253,8 +307,12 @@ const handleLinkedInScoreJob = async (): Promise<void> => {
     });
     
     if (response.success) {
-      // Display results
-      displayLinkedInScore(response.data.score);
+      // Store the scoring results for details view
+      latestScoringResults = response.data;
+      
+      // Display results - the score is in response.data.matchingScore
+      const score = response.data.matchingScore || response.data.score || 0;
+      displayLinkedInScore(score);
       scoreDisplay?.style.setProperty('display', 'inline-block');
       detailsBtn?.style.setProperty('display', 'inline-block');
       applyBtn?.style.setProperty('display', 'inline-block');
@@ -295,10 +353,123 @@ const displayLinkedInScore = (score: number): void => {
 
 // Handle view details for LinkedIn
 const handleLinkedInViewDetails = (): void => {
-  chrome.runtime.sendMessage({
-    type: 'SHOW_JOB_DETAILS',
-    payload: { url: window.location.href }
+  if (!latestScoringResults) {
+    console.error('No scoring results available');
+    return;
+  }
+  
+  showJobDetailsModal(latestScoringResults);
+};
+
+// Show job details modal
+const showJobDetailsModal = (scoringResults: any): void => {
+  // Remove existing modal if any
+  const existingModal = document.querySelector('.worko-details-modal');
+  if (existingModal) {
+    existingModal.remove();
+  }
+  
+  const modal = document.createElement('div');
+  modal.className = 'worko-details-modal';
+  modal.innerHTML = `
+    <div class="worko-modal-overlay">
+      <div class="worko-modal-content">
+        <div class="worko-modal-header">
+          <h3>Job Match Details</h3>
+          <button class="worko-modal-close">&times;</button>
+        </div>
+        <div class="worko-modal-body">
+          <div class="worko-overall-score">
+            <div class="worko-score-circle">
+              <span class="worko-score-number">${scoringResults.matchingScore}%</span>
+            </div>
+            <p class="worko-overall-explanation">${scoringResults.overallExplanation}</p>
+          </div>
+          
+          <div class="worko-breakdown-section">
+            <h4>Score Breakdown</h4>
+            <div class="worko-breakdown-items">
+              <div class="worko-breakdown-item">
+                <span class="worko-breakdown-label">Experience</span>
+                <div class="worko-breakdown-bar">
+                  <div class="worko-breakdown-fill" style="width: ${scoringResults.breakdown.experienceScore}%"></div>
+                </div>
+                <span class="worko-breakdown-score">${scoringResults.breakdown.experienceScore}%</span>
+              </div>
+              <div class="worko-breakdown-item">
+                <span class="worko-breakdown-label">Skills</span>
+                <div class="worko-breakdown-bar">
+                  <div class="worko-breakdown-fill" style="width: ${scoringResults.breakdown.skillsScore}%"></div>
+                </div>
+                <span class="worko-breakdown-score">${scoringResults.breakdown.skillsScore}%</span>
+              </div>
+              <div class="worko-breakdown-item">
+                <span class="worko-breakdown-label">Education</span>
+                <div class="worko-breakdown-bar">
+                  <div class="worko-breakdown-fill" style="width: ${scoringResults.breakdown.educationScore}%"></div>
+                </div>
+                <span class="worko-breakdown-score">${scoringResults.breakdown.educationScore}%</span>
+              </div>
+              <div class="worko-breakdown-item">
+                <span class="worko-breakdown-label">Location</span>
+                <div class="worko-breakdown-bar">
+                  <div class="worko-breakdown-fill" style="width: ${scoringResults.breakdown.locationScore}%"></div>
+                </div>
+                <span class="worko-breakdown-score">${scoringResults.breakdown.locationScore}%</span>
+              </div>
+              <div class="worko-breakdown-item">
+                <span class="worko-breakdown-label">Role Match</span>
+                <div class="worko-breakdown-bar">
+                  <div class="worko-breakdown-fill" style="width: ${scoringResults.breakdown.roleScore}%"></div>
+                </div>
+                <span class="worko-breakdown-score">${scoringResults.breakdown.roleScore}%</span>
+              </div>
+            </div>
+          </div>
+          
+          ${scoringResults.matchingKeywords && scoringResults.matchingKeywords.length > 0 ? `
+          <div class="worko-skills-section">
+            <h4>Your Matching Skills</h4>
+            <div class="worko-skills-list">
+              ${scoringResults.matchingKeywords.map((skill: string) => `<span class="worko-skill-tag worko-skill-match">${skill}</span>`).join('')}
+            </div>
+          </div>
+          ` : ''}
+          
+          ${scoringResults.missingSkills && scoringResults.missingSkills.length > 0 ? `
+          <div class="worko-skills-section">
+            <h4>Skills to Develop</h4>
+            <div class="worko-skills-list">
+              ${scoringResults.missingSkills.map((skill: string) => `<span class="worko-skill-tag worko-skill-missing">${skill}</span>`).join('')}
+            </div>
+          </div>
+          ` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Add event listeners
+  const closeBtn = modal.querySelector('.worko-modal-close');
+  const overlay = modal.querySelector('.worko-modal-overlay');
+  
+  closeBtn?.addEventListener('click', () => modal.remove());
+  overlay?.addEventListener('click', (e) => {
+    if (e.target === overlay) {
+      modal.remove();
+    }
   });
+  
+  // Close on escape key
+  const handleEscape = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      modal.remove();
+      document.removeEventListener('keydown', handleEscape);
+    }
+  };
+  document.addEventListener('keydown', handleEscape);
 };
 
 // Handle apply job for LinkedIn

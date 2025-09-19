@@ -61,7 +61,12 @@
     }
   ],
   
-
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*"],
+      "matches": ["https://www.naukri.com/*", "https://www.naukrigulf.com/*", "https://www.linkedin.com/*"]
+    }
+  ],
   
   "icons": {
     "16": "icons/16.png",
