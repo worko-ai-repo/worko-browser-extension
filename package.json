@@ -5,7 +5,12 @@
   "main": "background/background.js",
   "scripts": {
     "build": "webpack --mode=production",
+    "build:dev": "webpack --mode=development",
     "dev": "webpack --mode=development --watch",
+    "package:dev": "npm run build:dev && npm run zip:dev",
+    "package:store": "npm run build:dev && npm run zip:store",
+    "zip:dev": "cd dist && zip -r ../worko-extension-dev.zip . -x '*.map' && cd ..",
+    "zip:store": "cd dist && zip -r ../worko-extension-store.zip . -x '*.map' '*.d.ts*' && cd ..",
     "test": "jest",
     "lint": "eslint src/**/*.{js,ts}",
     "type-check": "tsc --noEmit"
